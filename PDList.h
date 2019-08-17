@@ -5,6 +5,8 @@
 #include "PositionDistance.h"
 #include "Types.h"
 
+#define LENGTH  100
+
 class PDList {
 public:
 
@@ -46,8 +48,11 @@ public:
    /* This is a suggestion of what you could use. */
    /* You can change this code.                   */
 private:
-   PDPtr    positions[100];
+    bool checkEquality(PDPtr posInList, PDPtr posProvided, char coord);
+
+   PDPtr    positions[LENGTH];
    int      numPositions;
+
 
 
 };

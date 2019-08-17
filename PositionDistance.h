@@ -24,7 +24,11 @@ public:
    /*                                           */
    /* YOU MAY ADD YOUR MODIFICATIONS HERE       */
    /*                                           */
-
+    
+    PositionDistance(int x, int y, int distance);
+    
+private:
+    int x, y, distance;
 };
 
 /*                                           */
