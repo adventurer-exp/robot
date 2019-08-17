@@ -406,6 +406,7 @@ bool run_unit_test(DataPtr data) {
    // Delete Position list
    delete finalPositions;
 
+   testPassed = false;
    // Do Milestone 3 tests
    if (data->m3) {
       std::cout << "Testing Milestone 3" << std::endl;

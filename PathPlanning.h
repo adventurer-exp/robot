@@ -8,6 +8,7 @@
 
 #define DIRECTIONS 4
 
+
 class PathPlanning {
 public:
 
@@ -41,13 +42,15 @@ public:
    /* YOU MAY ADD YOUR MODIFICATIONS HERE       */
    /*                                           */
 
-private:
-    void checkAddPos(int x, int y, int distance);
 
-    PDList* pdList;
+
+private:
+    void checkAddPos(int x, int y, int distance, PDList* pdList);
+    PDPtr findPosition(int x, int y);
+
+    PDList* list;
     Grid maze;
-    int rows;
-    int columns;
+    int rows, columns, x, y;
 
 };
 

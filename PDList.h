@@ -44,17 +44,18 @@ public:
    /* YOU MAY ADD YOUR MODIFICATIONS HERE       */
    /*                                           */
 
+   // Used to return the list without the starting position as required
+   void resizeArray();
+
+    PDList(PDList &other);
 
    /* This is a suggestion of what you could use. */
    /* You can change this code.                   */
 private:
     bool checkEquality(PDPtr posInList, PDPtr posProvided, char coord);
 
-   PDPtr    positions[LENGTH];
-   int      numPositions;
-
-
-
+    PDPtr    positions[LENGTH];
+    int      numPositions;
 };
 
 #endif // COSC_ASS_ONE_POSITION_LIST
