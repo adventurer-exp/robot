@@ -5,20 +5,30 @@
 #include <cstdlib>
 #include <iostream>
 
-
 // Create a New Empty List
 PDList::PDList() {
     numPositions = 0;
-    for (PDPtr &position : positions) {
+    for (auto & position : positions) {
         position = nullptr;
     }
 }
 
-//
+PDList::PDList(PDList &list){
+    this->numPositions = list.numPositions;
+    for (int i = 0; i < LENGTH; ++i) {
+        if (list.positions[i] != nullptr) {
+            this->positions[i] = new PositionDistance(list.positions[i]->getX(),
+                    list.positions[i]->getY(), list.positions[i]->getDistance());
+        } else {
+            positions[i] = nullptr;
+        }
+
+    }
+}
 
 // Clean-up the list
 PDList::~PDList() {
-
+    clear();
 }
 
 // Number of items in the list
@@ -31,10 +41,11 @@ PDPtr PDList::get(int i) {
    return positions[i];
 }
 
-/* Add a position-distance (as a pointer) to the list
+/*
+ * Add a position-distance (as a pointer) to the list
  * This class now has control over the pointer
  * And should delete the pointer if the position-distance is removed from the list
- * */
+ */
 void PDList::addBack(PDPtr position) {
     positions[numPositions] = position;
     numPositions++;
@@ -55,7 +66,7 @@ bool PDList::containsCoordinate(PDPtr position) {
     return false;
 }
 
-// Compares coordinates of two different PD lists and returns true if their values are equal
+// Compares coordinates of two different PDPtr lists and returns true if their values are equal
 bool PDList::checkEquality(PDPtr posInList, PDPtr posProvided, char coord) {
     if (coord == 'x'){
         return posInList->getX() == posProvided->getX();
@@ -67,6 +78,8 @@ bool PDList::checkEquality(PDPtr posInList, PDPtr posProvided, char coord) {
 
 // removes starting position from the list and moves pointers
 void PDList::resizeArray(){
+    delete positions[0];
+    positions[0] = nullptr;
     for (int j = 0; j < numPositions; ++j) {
         positions[j] = positions[j + 1];
     }
@@ -76,10 +89,20 @@ void PDList::resizeArray(){
 
 // Remove everything from the list
 void PDList::clear() {
-    for (int i = 0; i < this->numPositions; ++i) {
-        if (positions[i] != nullptr){
-            delete this->positions[i];
-            this->positions[i] = nullptr;
+    for (int i = 0; i != numPositions; ++i) {
+        if (positions[i] != nullptr) {
+            delete positions[i];
+            positions[i] = nullptr;
         }
     }
 }
+
+
+// Try to create an array dynamically
+/*PDList::PDList() : ROWS(1), COLUMNS(100) {
+    positions = new PDPtr[100];
+    numPositions = 0;
+    for (int i = 0; i < LENGTH; ++i) {
+        positions[i] = nullptr;
+    }
+}*/

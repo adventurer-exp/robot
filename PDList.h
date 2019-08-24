@@ -5,7 +5,7 @@
 #include "PositionDistance.h"
 #include "Types.h"
 
-#define LENGTH  100
+#define LENGTH 100
 
 class PDList {
 public:
@@ -44,18 +44,22 @@ public:
    /* YOU MAY ADD YOUR MODIFICATIONS HERE       */
    /*                                           */
 
+
    // Used to return the list without the starting position as required
    void resizeArray();
 
-    PDList(PDList &other);
+   PDList(PDList &list);
 
-   /* This is a suggestion of what you could use. */
+
+    /* This is a suggestion of what you could use. */
    /* You can change this code.                   */
 private:
     bool checkEquality(PDPtr posInList, PDPtr posProvided, char coord);
 
-    PDPtr    positions[LENGTH];
     int      numPositions;
+    // const int ROWS, COLUMNS;
+    // const int LENGTH = (ROWS) * (COLUMNS);
+    PDPtr positions[LENGTH];
 };
 
 #endif // COSC_ASS_ONE_POSITION_LIST

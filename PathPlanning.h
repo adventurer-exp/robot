@@ -43,15 +43,16 @@ public:
    /*                                           */
 
 
-
 private:
     void checkAddPos(int x, int y, int distance, PDList* pdList);
-    PDPtr findPosition(int x, int y);
 
     PDList* list;
     Grid maze;
     int rows, columns, x, y;
 
+    PDPtr findPosition(int x, int y);
+
+    bool getNextStep(int toX, int toY, int distance);
 };
 
 #endif // COSC_ASS_ONE_PATH_PLANNING

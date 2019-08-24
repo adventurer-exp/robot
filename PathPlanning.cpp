@@ -10,17 +10,22 @@
 #define POS_DIST position->getDistance()
 
 /*
- * I tried to make the program as simple as I could
+ * I started with implementing the simplest part at first, created the constructor and variables for PosDist and after
+ * that I started with PDPtr List because I wanted to make the simple steps first before going to the more complicated part and
+ * actually making the algorithm work. And as I was creating the smaller parts and methods I was sure about, I started to
+ * properly understand bigger chunks of the program and what happens in the bigger picture.
  *
  * Issues
  * returning an array without first value
  * Simple algorithm on checking the surroundings ( 0 1, 0 -1, 1 0, -1 0)
  * Hard copying positions to temp array instead of just adding pointer
+ * When I was trying to allocate the positions array dynamically when constructing PDList I always ended up with a length
+ * of 3 instead of desired length, even when setting the length to an exact number.
  *
  * Pros and Cons
  * - When cutting the array in order to return it, if it comes to filling the whole positions array, I would lose last value
  * I believe there must be a more efficient way of checking the surroundings however I couldn't come up with anything simpler
- * If PD List needed again with starting position, that would not be possible
+ * If PDPtr List needed again with starting position, that would not be possible
  * Never using size of the maze
  *
  * + when creating Lists, all values in array are set to null to avoid errors
@@ -31,6 +36,8 @@
  *
  */
 
+
+
 PathPlanning::PathPlanning(Grid maze, int rows, int cols) {
     this->maze = maze;
     this->columns = cols;
@@ -38,48 +45,59 @@ PathPlanning::PathPlanning(Grid maze, int rows, int cols) {
 }
 
 PathPlanning::~PathPlanning() {
+    if (rows >= 0 && columns >= 0) {
+        for (int i = 0; i != rows; ++i) {
+            delete maze[i];
+            maze[i] = nullptr;
+        }
+        delete maze;
+        maze = nullptr;
+    }
+    delete list;
 }
 
 void PathPlanning::initialPosition(int x, int y) {
+    // Adds the initial position
     this->x = x;
     this->y = y;
-    // Adds an initial position
 }
 
 PDList* PathPlanning::getReachablePositions() {
-    auto* tempList = new PDList();
-    PDList* posDistances = new PDList();
+        auto* tempList = new PDList();
+        PDList* posDistances = new PDList();
 
-    posDistances->addBack(new PositionDistance(x, y, 0));
 
-    int count = 0;
+        posDistances->addBack(new PositionDistance(x, y, 0));
 
-    do {
-        // Check if tempList contains
-        if (!tempList->containsCoordinate(posDistances->get(count))){
-            // If it doesnt add it to it
-            PDPtr position = posDistances->get(count);
+        int count = 0;
 
-            // Do a loop (check) for surrounding fields (x +- 1, y +- 1)
-            int xCoord = 1, yCoord = 1;
-            for (int i = 0; i < DIRECTIONS/2; ++i) {
-                // Pass in current position and change x, y
-                checkAddPos(XPOS, YPOS + yCoord, POS_DIST, posDistances);
-                checkAddPos(XPOS + xCoord, YPOS, POS_DIST, posDistances);
-                xCoord = -xCoord;
-                yCoord = -yCoord;
+        do {
+            // Check if tempList contains
+            if (!tempList->containsCoordinate(posDistances->get(count))){
+                // If it doesnt add it to it
+                PDPtr position = posDistances->get(count);
+
+                // Do a loop (check) for surrounding fields (x +- 1, y +- 1)
+                int xCoord = 1, yCoord = 1;
+                for (int i = 0; i < DIRECTIONS/2; ++i) {
+                    // Pass in current position and change x, y
+                    checkAddPos(XPOS, YPOS + yCoord, POS_DIST, posDistances);
+                    checkAddPos(XPOS + xCoord, YPOS, POS_DIST, posDistances);
+                    xCoord = -xCoord;
+                    yCoord = -yCoord;
+                }
+                // Adds position that has been checked into the temporary list
+                tempList->addBack(new PositionDistance(XPOS, YPOS, POS_DIST));
             }
-            // Adds position that has been checked into the temporary list
-            tempList->addBack(new PositionDistance(XPOS, YPOS, POS_DIST));
-        }
-        count++;
-        // stops the loop when temporary list reaches the same amount of objects as pdList
-    } while (posDistances->size() != tempList->size());
-    posDistances->resizeArray();
-    tempList->resizeArray();
-    list = tempList;
-    return posDistances;
-}
+            count++;
+            // stops the loop when temporary list reaches the same amount of objects as pdList
+        } while (posDistances->size() != tempList->size());
+        posDistances->resizeArray();
+        tempList->resizeArray();
+        PDList* newList = new PDList(*posDistances);
+        list = newList;
+        return posDistances;
+    }
 
 // Checks if required field is accessible ('.'), if so, checks if it already is in PDList
 // and in case it is not, adds it there with distance 1 bigger than current position
@@ -88,6 +106,9 @@ void PathPlanning::checkAddPos(int x, int y, int distance, PDList* pdList) {
         auto position = new PositionDistance(x, y, distance + 1);
         if (!pdList->containsCoordinate(position)) {
             pdList->addBack(position);
+        } else {
+            delete position;
+            position = nullptr;
         }
     }
 }
@@ -103,18 +124,19 @@ void PathPlanning::checkAddPos(int x, int y, int distance, PDList* pdList) {
  * add x and y variables with distance 0
  * return path
  */
+
 PDList* PathPlanning::getPath(int toX, int toY) {
     PDList* path = new PDList();
     PDPtr position =  findPosition(toX, toY);
     path->addBack(position);
     int distance = position->getDistance();
 
-    while (distance != 1){
-        if (maze[toY + 1][toX] == '.' && findPosition(toX, toY + 1)->getDistance() == distance - 1) {
+    while (distance != 1) {
+        if (getNextStep(toX, toY + 1, distance)) {
             toY++;
-        } else if (maze[toY - 1][toX] == '.'&& findPosition(toX, toY - 1)->getDistance() == distance - 1) {
+        } else if (getNextStep(toX, toY - 1, distance)) {
             toY--;
-        } else if (maze[toY][toX + 1] == '.' && findPosition(toX + 1, toY)->getDistance() == distance - 1){
+        } else if (getNextStep(toX + 1, toY, distance)){
             toX++;
         } else {
             toX--;
@@ -123,7 +145,13 @@ PDList* PathPlanning::getPath(int toX, int toY) {
         path->addBack(new PositionDistance(toX, toY, distance));
     }
 
+    path->addBack(new PositionDistance(x, y, 0));
+
     return path;
+}
+
+bool PathPlanning::getNextStep(int toX, int toY, int distance) {
+    return maze[toY][toX] == '.' && findPosition(toX, toY)->getDistance() == distance - 1;
 }
 
 PDPtr PathPlanning::findPosition(int x, int y) {
@@ -132,4 +160,5 @@ PDPtr PathPlanning::findPosition(int x, int y) {
             return list->get(i);
         }
     }
+    return nullptr;
 }
