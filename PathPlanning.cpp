@@ -14,13 +14,13 @@
  * that I started with PDPtr List because I wanted to make the simple steps first before going to the more complicated part and
  * actually making the algorithm work. And as I was creating the smaller parts and methods I was sure about, I started to
  * properly understand bigger chunks of the program and what happens in the bigger picture.
+ * After that I
  *
  * Issues
  * returning an array without first value
  * Simple algorithm on checking the surroundings ( 0 1, 0 -1, 1 0, -1 0)
  * Hard copying positions to temp array instead of just adding pointer
- * When I was trying to allocate the positions array dynamically when constructing PDList I always ended up with a length
- * of 3 instead of desired length, even when setting the length to an exact number.
+ * Trying to figure out dynamic allocation to an array so that it only creates maximum reachable positions
  *
  * Pros and Cons
  * - When cutting the array in order to return it, if it comes to filling the whole positions array, I would lose last value
@@ -36,8 +36,6 @@
  *
  */
 
-
-
 PathPlanning::PathPlanning(Grid maze, int rows, int cols) {
     this->maze = maze;
     this->columns = cols;
@@ -50,8 +48,7 @@ PathPlanning::~PathPlanning() {
             delete maze[i];
             maze[i] = nullptr;
         }
-        delete maze;
-        maze = nullptr;
+        delete [] maze;
     }
     delete list;
 }
@@ -63,9 +60,8 @@ void PathPlanning::initialPosition(int x, int y) {
 }
 
 PDList* PathPlanning::getReachablePositions() {
-        auto* tempList = new PDList();
-        PDList* posDistances = new PDList();
-
+        auto* tempList = new PDList(rows, columns);
+        auto* posDistances = new PDList(rows, columns);
 
         posDistances->addBack(new PositionDistance(x, y, 0));
 
@@ -93,8 +89,8 @@ PDList* PathPlanning::getReachablePositions() {
             // stops the loop when temporary list reaches the same amount of objects as pdList
         } while (posDistances->size() != tempList->size());
         posDistances->resizeArray();
-        tempList->resizeArray();
-        PDList* newList = new PDList(*posDistances);
+        delete tempList;
+        auto* newList = new PDList(*posDistances, rows, columns);
         list = newList;
         return posDistances;
     }
@@ -126,7 +122,7 @@ void PathPlanning::checkAddPos(int x, int y, int distance, PDList* pdList) {
  */
 
 PDList* PathPlanning::getPath(int toX, int toY) {
-    PDList* path = new PDList();
+    PDList* path = new PDList(rows, columns);
     PDPtr position =  findPosition(toX, toY);
     path->addBack(position);
     int distance = position->getDistance();

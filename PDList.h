@@ -5,7 +5,7 @@
 #include "PositionDistance.h"
 #include "Types.h"
 
-#define LENGTH 100
+#define BORDERS 2
 
 class PDList {
 public:
@@ -18,7 +18,7 @@ public:
    // Create a New Empty List
    PDList();
 
-   // Clean-up the list
+// Clean-up the list
    ~PDList();
 
    // Number of items in the list
@@ -48,7 +48,9 @@ public:
    // Used to return the list without the starting position as required
    void resizeArray();
 
-   PDList(PDList &list);
+    PDList(int rows, int columns);
+
+   PDList(PDList &list, int rows, int columns);
 
 
     /* This is a suggestion of what you could use. */
@@ -57,9 +59,9 @@ private:
     bool checkEquality(PDPtr posInList, PDPtr posProvided, char coord);
 
     int      numPositions;
-    // const int ROWS, COLUMNS;
-    // const int LENGTH = (ROWS) * (COLUMNS);
-    PDPtr positions[LENGTH];
+    const int ROWS, COLUMNS;
+    const int LENGTH = (ROWS) * (COLUMNS);
+    PDPtr *positions;
 };
 
 #endif // COSC_ASS_ONE_POSITION_LIST

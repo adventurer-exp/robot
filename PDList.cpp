@@ -5,15 +5,17 @@
 #include <cstdlib>
 #include <iostream>
 
-// Create a New Empty List
-PDList::PDList() {
+// Create a New Empty List (capable of holding only as many positions that can have a value as necessary (no borders)
+PDList::PDList(int rows, int columns) : ROWS(rows - BORDERS), COLUMNS(columns - BORDERS) {
+    positions = new PDPtr [LENGTH];
     numPositions = 0;
-    for (auto & position : positions) {
-        position = nullptr;
+    for (int i = 0; i != LENGTH; i++) {
+        positions[i] = nullptr;
     }
 }
 
-PDList::PDList(PDList &list){
+PDList::PDList(PDList &list, int rows, int columns) : ROWS(rows - 2), COLUMNS(columns - 2) {
+    positions = new PDPtr [LENGTH];
     this->numPositions = list.numPositions;
     for (int i = 0; i < LENGTH; ++i) {
         if (list.positions[i] != nullptr) {
@@ -89,20 +91,10 @@ void PDList::resizeArray(){
 
 // Remove everything from the list
 void PDList::clear() {
-    for (int i = 0; i != numPositions; ++i) {
+    for (int i = 0; i != LENGTH; ++i) {
         if (positions[i] != nullptr) {
             delete positions[i];
             positions[i] = nullptr;
         }
     }
 }
-
-
-// Try to create an array dynamically
-/*PDList::PDList() : ROWS(1), COLUMNS(100) {
-    positions = new PDPtr[100];
-    numPositions = 0;
-    for (int i = 0; i < LENGTH; ++i) {
-        positions[i] = nullptr;
-    }
-}*/
